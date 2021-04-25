@@ -160,15 +160,13 @@ class ProcessThread(AbstractProcessThread):
         )
 
     def get_origin_filter(self):
-        return OriginCoordinateFilter()
+        return OriginCoordinateFilter(self.configuration)
 
     def get_red_filter(self):
-        return RedCoordinateFilter()
+        return RedCoordinateFilter(self.configuration)
 
     def get_blue_filter(self):
-        return BlueCoordinateFilter()
+        return BlueCoordinateFilter(self.configuration)
 
     def get_target_filter(self):
-        return TargetFilter()
-
-
+        return TargetFilter(self.configuration)
