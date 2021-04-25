@@ -25,6 +25,10 @@ class Configuration:
         config.coordinate.real_origin_to_red_length = int(config_ini[section]['RealOriginToRedLength'])
         config.coordinate.real_origin_to_blue_length = int(config_ini[section]['RealOriginToBlueLength'])
 
+        config.coordinate.origin_name = config_ini[section]['OriginName']
+        config.coordinate.red_name = config_ini[section]['RedName']
+        config.coordinate.blue_name = config_ini[section]['BlueName']
+
         config.coordinate.manual_origin_x = int(config_ini[section]['ManualOriginX'])
         config.coordinate.manual_origin_y = int(config_ini[section]['ManualOriginY'])
 
@@ -32,7 +36,7 @@ class Configuration:
         config.coordinate.manual_red_y = int(config_ini[section]['ManualRedY'])
 
         config.coordinate.manual_blue_x = int(config_ini[section]['ManualBlueX'])
-        config.coordinate.manual_blue_x = int(config_ini[section]['ManualBlueY'])
+        config.coordinate.manual_blue_y = int(config_ini[section]['ManualBlueY'])
 
         section = 'target'
         config.target.cfg_path = config_ini[section]['CfgPath']
@@ -64,6 +68,10 @@ class Configuration:
 
             self.real_origin_to_red_length = None
             self.real_origin_to_blue_length = None
+
+            self.origin_name = None
+            self.red_name = None
+            self.blue_name = None
 
             self.manual_origin_x = None
             self.manual_origin_y = None
