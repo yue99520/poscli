@@ -1,9 +1,6 @@
 import abc
 from threading import Thread, Lock
 
-from apps.base.config import Configuration
-from apps.context import SystemContext
-
 
 class SystemState:
     """
@@ -31,7 +28,7 @@ class SystemState:
         self.lock.release()
 
 
-class BaseThread(Thread, abc.ABC):
+class BaseThread(Thread):
     """
     可控生命週期線程物件
     """
@@ -65,12 +62,12 @@ class BaseThread(Thread, abc.ABC):
 
 
 class ContextThread(BaseThread):
-    def __init__(self, name: str, context: SystemContext):
+    def __init__(self, name: str, context):
         super().__init__(name)
-        self.context: SystemContext = context
+        self.context = context
 
 
 class ApplicationThread(ContextThread):
-    def __init__(self, name: str, context: SystemContext, config: Configuration):
+    def __init__(self, name: str, context, config):
         super().__init__(name, context)
         self.configuration = config

@@ -15,7 +15,7 @@ from apps.process.filter import RawPositionsFilterer, RedCoordinateFilter, BlueC
 from apps.process.linear import RealPositionProcessor, Point
 
 
-class AbstractProcessThread(ApplicationThread, ProcessThreadInterface, abc.ABC):
+class AbstractProcessThread(ProcessThreadInterface):
     """
     1. 將 unfiltered_positions 過濾成虛擬座標位置與虛擬目標位置
     2. 計算虛擬座標位置與虛擬目標位置的相對位置，並轉為目標與機械手臂相對位置

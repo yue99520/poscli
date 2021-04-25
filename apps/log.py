@@ -19,4 +19,4 @@ def logger_init(log_level):
         format='%(levelname)-8s | %(asctime)s | %(module)s:%(lineno)d | %(message)s'
     )
 
-    logging.info("Logger initialized. level=" + logging.getLevelName(log_level))
+    # logging.info("Logger initialized. level=" + logging.getLevelName(log_level))

@@ -10,7 +10,7 @@ from apps.context import ViewThreadInterface, SystemContext
 from apps.view.shape import Rectangle, Point
 
 
-class ViewThread(ApplicationThread, ViewThreadInterface, abc.ABC):
+class ViewThread(ViewThreadInterface):
     def __init__(self, name: str, context: SystemContext, config: Configuration, camera: Camera):
         super().__init__(name, context, config)
         self._camera = camera

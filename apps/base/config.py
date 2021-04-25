@@ -20,7 +20,7 @@ class Configuration:
         config.coordinate.cfg_path = config_ini[section]['CfgPath']
         config.coordinate.data_path = config_ini[section]['DataPath']
         config.coordinate.weights_path = config_ini[section]['WeightsPath']
-        config.coordinate.confident_threshold = int(config_ini[section]['ConfidentThreshold'])
+        config.coordinate.confident_threshold = float(config_ini[section]['ConfidentThreshold'])
 
         config.coordinate.real_origin_to_red_length = int(config_ini[section]['RealOriginToRedLength'])
         config.coordinate.real_origin_to_blue_length = int(config_ini[section]['RealOriginToBlueLength'])
@@ -42,7 +42,7 @@ class Configuration:
         config.target.cfg_path = config_ini[section]['CfgPath']
         config.target.data_path = config_ini[section]['DataPath']
         config.target.weights_path = config_ini[section]['WeightsPath']
-        config.target.confident_threshold = int(config_ini[section]['ConfidentThreshold'])
+        config.target.confident_threshold = float(config_ini[section]['ConfidentThreshold'])
 
         section = 'arm'
         config.arm.destination_x = int(config_ini[section]['DestinationX'])

@@ -15,8 +15,12 @@ class Application:
     def __init__(self, cfg=None):
         self.configuration = Configuration.from_ini(cfg)
         self.system_context = SystemContext()
+        logger_init(self.configuration.system.log_level)
+        logging.debug("start")
+
         self.camera = Camera(self.configuration.camera.vertical_camera_port)
 
+        logging.debug("target thread init")
         self.system_context.target_detect_thread = TargetDetectThread(
             name="TargetDetectThread",
             context=self.system_context,
@@ -24,6 +28,7 @@ class Application:
             camera=self.camera,
         )
 
+        logging.debug("coordinate thread init")
         self.system_context.coordinate_detect_thread = CoordinateDetectThread(
             name="CoordinateDetectThread",
             context=self.system_context,
@@ -31,6 +36,7 @@ class Application:
             camera=self.camera,
         )
 
+        logging.debug("process thread init")
         self.system_context.process_thread = ProcessThread(
             name="ProcessThread",
             context=self.system_context,
@@ -45,10 +51,13 @@ class Application:
         )
 
     def run(self):
+        logging.debug("coordinate thread start")
         self.system_context.coordinate_detect_thread.start()
+        logging.debug("target thread start")
         self.system_context.target_detect_thread.start()
+        logging.debug("process thread start")
         self.system_context.process_thread.start()
-        self.system_context.view_thread.start()
+        self.system_context.view_thread.run()
 
-        controller = CommandController(self.configuration, self.system_context)
-        controller.run()
+        # controller = CommandController(self.configuration, self.system_context)
+        # controller.run()

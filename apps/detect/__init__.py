@@ -13,7 +13,7 @@ from apps.detect.coordinate import CoordinateClassifier
 from apps.detect.detect import Detector, CoordinateDetector, TargetDetector
 
 
-class DetectThread(ApplicationThread, DetectThreadInterface, abc.ABC):
+class DetectThread(DetectThreadInterface):
 
     def __init__(self, name: str, context: SystemContext, config: Configuration, camera: Camera):
         super().__init__(name, context, config)

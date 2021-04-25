@@ -51,7 +51,7 @@ class Detector(Darknet):
 
 class TargetDetector(Detector):
     def __init__(self, config: Configuration, **kwargs):
-        super().__init__(config, **kwargs)
+        super(TargetDetector, self).__init__(config, **kwargs)
         self.threshold = config.target.confident_threshold
 
     def create_detected_object(self, frame, name, x, y, width, height, confidence) -> Union[DetectedObject, None]:

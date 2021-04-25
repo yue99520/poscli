@@ -1,4 +1,5 @@
-from apps import Configuration, SystemContext
+from apps.base.config import Configuration
+from apps.context import SystemContext
 from PyInquirer import prompt
 
 
