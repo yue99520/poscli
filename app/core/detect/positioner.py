@@ -23,14 +23,14 @@ class Positioner(Thread):
                 break
 
 
-class TargetPositioner(Positioner):
+class RealPositionProcessThread(Positioner):
     def __init__(self,
                  real_axis_len,
                  real_position: TargetPosition,
                  coordinate_context: CoordinatePosition,
                  target_context: TargetPosition):
 
-        super(TargetPositioner, self).__init__(name="TargetPositionerThread")
+        super(RealPositionProcessThread, self).__init__(name="TargetPositionerThread")
 
         self.processor = RealPositionProcessor(real_axis_len)
         self._coordinate = coordinate_context

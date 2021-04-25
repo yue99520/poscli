@@ -1,5 +1,5 @@
 from threading import Lock
-
+from cv2 import cv2 as cv
 from numpy import ndarray
 
 
