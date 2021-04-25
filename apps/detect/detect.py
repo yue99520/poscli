@@ -3,11 +3,13 @@ from typing import Union
 from pydarknet import Detector as Darknet, Image as DarknetImage
 
 from apps.base import DetectedObject
+from apps.base.config import Configuration
 from apps.detect import CoordinateClassifier
 
 
 class Detector(Darknet):
-    def __init__(self, **kwargs):
+    def __init__(self, config: Configuration, **kwargs):
+        self.config = config
         self.cfg_path = kwargs.get("cfg_path")
         self.weights_path = kwargs.get("weights_path")
         self.data_path = kwargs.get("data_path")
@@ -36,7 +38,7 @@ class Detector(Darknet):
                 unfiltered_positions.append(position)
         return unfiltered_positions
 
-    def create_detected_object(self, frame, name, x, y, width, height, confidence) -> DetectedObject:
+    def create_detected_object(self, frame, name, x, y, width, height, confidence) -> Union[DetectedObject, None]:
         return DetectedObject(
             name=name,
             x=x,
@@ -47,18 +49,35 @@ class Detector(Darknet):
         )
 
 
-class CoordinateDetector(Detector):
-    def __init__(self, origin_name, red_name, blue_name, **kwargs):
-        super().__init__(**kwargs)
-        self._coordinate_classifier = CoordinateClassifier()
-        self.origin_name = origin_name
-        self.red_name = red_name
-        self.blue_name = blue_name
+class TargetDetector(Detector):
+    def __init__(self, config: Configuration, **kwargs):
+        super().__init__(config, **kwargs)
+        self.threshold = config.target.confident_threshold
 
     def create_detected_object(self, frame, name, x, y, width, height, confidence) -> Union[DetectedObject, None]:
         position = super().create_detected_object(frame, name, x, y, width, height, confidence)
-        coord_type = self._coordinate_classifier.classify(frame, position)
+        if position.confidence < self.threshold:
+            return None
+        return position
 
+
+class CoordinateDetector(Detector):
+    def __init__(self, config: Configuration, **kwargs):
+        super().__init__(config, **kwargs)
+        self.threshold = config.coordinate.confident_threshold
+
+        self._coordinate_classifier = CoordinateClassifier()
+
+        self.origin_name = config.coordinate.origin_name,
+        self.red_name = config.coordinate.red_name,
+        self.blue_name = config.coordinate.blue_name,
+
+    def create_detected_object(self, frame, name, x, y, width, height, confidence) -> Union[DetectedObject, None]:
+        position = super().create_detected_object(frame, name, x, y, width, height, confidence)
+        if position.confidence < self.threshold:
+            return None
+
+        coord_type = self._coordinate_classifier.classify(frame, position)
         if coord_type == CoordinateClassifier.ORIGIN:
             position.name = self.origin_name
         elif coord_type == CoordinateClassifier.RED:

@@ -10,7 +10,7 @@ from apps.base.thread import ApplicationThread
 from apps.camera import Camera
 from apps.context import SystemContext, DetectThreadInterface
 from apps.detect.coordinate import CoordinateClassifier
-from apps.detect.detect import Detector, CoordinateDetector
+from apps.detect.detect import Detector, CoordinateDetector, TargetDetector
 
 
 class DetectThread(ApplicationThread, DetectThreadInterface, abc.ABC):
@@ -48,7 +48,8 @@ class DetectThread(ApplicationThread, DetectThreadInterface, abc.ABC):
 
 class TargetDetectThread(DetectThread):
     def get_detector(self, config: Configuration) -> Detector:
-        return Detector(
+        return TargetDetector(
+            config=config,
             cfg_path=self.configuration.target.cfg_path,
             weights_path=self.configuration.target.weights_path,
             data_path=self.configuration.target.data_path,
@@ -58,9 +59,7 @@ class TargetDetectThread(DetectThread):
 class CoordinateDetectThread(DetectThread):
     def get_detector(self, config: Configuration) -> Detector:
         return CoordinateDetector(
-            origin_name=config.coordinate.origin_name,
-            red_name=config.coordinate.red_name,
-            blue_name=config.coordinate.blue_name,
+            config=config,
             cfg_path=self.configuration.coordinate.cfg_path,
             weights_path=self.configuration.coordinate.weights_path,
             data_path=self.configuration.coordinate.data_path,
