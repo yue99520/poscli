@@ -50,6 +50,7 @@ class Configuration:
         config.arm.destination_Z = int(config_ini[section]['DestinationZ'])
         config.arm.vertical_off_set = int(config_ini[section]['VerticalOffSet'])
         config.arm.horizontal_off_set = int(config_ini[section]['HorizontalOffSet'])
+        return config
 
     class System:
         def __init__(self):
