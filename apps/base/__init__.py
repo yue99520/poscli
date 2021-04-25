@@ -19,7 +19,7 @@ class ProcessedObject:
 
 
 class FilteredPositions:
-    def __init__(self, origin, red, blue, target):
+    def __init__(self, origin: DetectedObject, red: DetectedObject, blue: DetectedObject, target: DetectedObject):
         self.origin = origin
         self.red = red
         self.blue = blue
