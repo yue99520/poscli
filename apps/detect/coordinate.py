@@ -1,6 +1,10 @@
+import numpy as np
+
 from numpy import ndarray
 
 from apps.base import DetectedObject
+
+np.seterr(divide='ignore', invalid='ignore')
 
 
 class CoordinateClassifier:
@@ -24,7 +28,7 @@ class CoordinateClassifier:
     def cut_frame(self, frame: ndarray, detected_object: DetectedObject):
         return frame[int(detected_object.y - detected_object.height / 2 + 3): int(detected_object.y + detected_object.height / 2 - 3), int(detected_object.x - detected_object.width / 2 + 3): int(detected_object.x + detected_object.width / 2 - 3)]
 
-    def average_color(self, frame):
+    def average_color(self, frame: ndarray):
         return frame.mean(axis=0).mean(axis=0)
 
     def is_red(self, avg_color):

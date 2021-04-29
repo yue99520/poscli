@@ -1,5 +1,7 @@
 import logging
 
+import numpy as np
+
 from apps.base import config
 from apps.base.config import Configuration
 from apps.cli import CommandController
@@ -17,6 +19,7 @@ class Application:
         self.system_context = SystemContext()
         logger_init(self.configuration.system.log_level)
         logging.debug("start")
+        self.system_context.logging = logging
 
         self.camera = Camera(self.configuration.camera.vertical_camera_port)
 
@@ -56,7 +59,7 @@ class Application:
         logging.debug("target thread start")
         self.system_context.target_detect_thread.start()
         logging.debug("process thread start")
-        self.system_context.process_thread.start()
+        # self.system_context.process_thread.start()
         self.system_context.view_thread.run()
 
         # controller = CommandController(self.configuration, self.system_context)

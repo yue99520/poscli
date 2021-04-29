@@ -29,7 +29,7 @@ class AbstractProcessThread(ProcessThreadInterface):
 
         self._filtered_positions_lock = Lock()
         self._filtered_positions_id = 0
-        self._filtered_positions = None
+        self._filtered_positions = FilteredPositions(None, None, None, None)
 
         self._origin_filter = self.get_origin_filter()
         self._red_filter = self.get_red_filter()
@@ -42,10 +42,10 @@ class AbstractProcessThread(ProcessThreadInterface):
         self._current_target_data_id = -1
 
     def run_loop(self) -> None:
-        raw_targets = self._get_target_unfiltered_positions()
-        raw_coordinates = self._get_coordinate_unfiltered_positions()
+        raw_targets_stack = self._get_and_merge_target_positions()
+        raw_coordinates_stack = self._get_and_merge_coordinate_positions()
 
-        filtered_positions = self._filter_positions(raw_targets, raw_coordinates)
+        filtered_positions = self._filter_positions(raw_targets_stack, raw_coordinates_stack)
         self.set_filtered_positions(filtered_positions)
 
         processed_target = self._process_target(
@@ -56,29 +56,23 @@ class AbstractProcessThread(ProcessThreadInterface):
         )
         self.set_processed_target(processed_target)
 
-    def _get_coordinate_unfiltered_positions(self) -> List[DetectedObject]:
-        while True:
-            positions, data_id = self.context.coordinate_detect_thread.get_unfiltered_positions()
-            if self._current_coord_data_id != data_id and len(positions) > 0:
-                self._current_coord_data_id = data_id
-                return positions
-            else:
-                sleep(0.2)
+    def _get_and_merge_coordinate_positions(self) -> List[DetectedObject]:
+        positions = list()
+        for i in range(self.get_merge_depth()):
+            positions.append(self.context.coordinate_detect_thread.get_unfiltered_positions())
+        return positions
 
-    def _get_target_unfiltered_positions(self) -> List[DetectedObject]:
-        while True:
-            positions, data_id = self.context.target_detect_thread.get_unfiltered_positions()
-            if self._current_target_data_id != data_id and len(positions) > 0:
-                self._current_target_data_id = data_id
-                return positions
-            else:
-                sleep(0.2)
+    def _get_and_merge_target_positions(self) -> List[DetectedObject]:
+        positions = list()
+        for i in range(self.get_merge_depth()):
+            positions.append(self.context.target_detect_thread.get_unfiltered_positions())
+        return positions
     
-    def _filter_positions(self, raw_targets: List[DetectedObject], raw_coordinates: List[DetectedObject]) -> FilteredPositions:
-        raw_coordinates, filtered_raw_origin = self._origin_filter.filter(raw_coordinates)
-        raw_coordinates, filtered_raw_red = self._red_filter.filter(raw_coordinates)
-        raw_coordinates, filtered_raw_blue = self._blue_filter.filter(raw_coordinates)
-        raw_targets, filtered_raw_target = self._target_filter.filter(raw_targets)
+    def _filter_positions(self, raw_targets_stack: List[List[DetectedObject]], raw_coordinates_stack: List[List[DetectedObject]]) -> FilteredPositions:
+        filtered_raw_origin = self._origin_filter.filter(raw_coordinates_stack)
+        filtered_raw_red = self._red_filter.filter(raw_coordinates_stack)
+        filtered_raw_blue = self._blue_filter.filter(raw_coordinates_stack)
+        filtered_raw_target = self._target_filter.filter(raw_targets_stack)
         
         return FilteredPositions(
             origin=filtered_raw_origin,
@@ -132,6 +126,9 @@ class AbstractProcessThread(ProcessThreadInterface):
         self._filtered_positions = filtered_positions
         self._filtered_positions_id = randint(0, 1000)
         self._filtered_positions_lock.release()
+
+    def get_merge_depth(self) -> int:
+        raise NotImplementedError()
 
     def get_processor(self) -> RealPositionProcessor:
         raise NotImplementedError()

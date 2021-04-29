@@ -1,3 +1,6 @@
+from typing import Union
+
+
 class DetectedObject:
     def __init__(self, name, x, y, width, height, confidence):
         self.name = name
@@ -19,7 +22,7 @@ class ProcessedObject:
 
 
 class FilteredPositions:
-    def __init__(self, origin: DetectedObject, red: DetectedObject, blue: DetectedObject, target: DetectedObject):
+    def __init__(self, origin: Union[DetectedObject, None], red: Union[DetectedObject, None], blue: Union[DetectedObject, None], target: Union[DetectedObject, None]):
         self.origin = origin
         self.red = red
         self.blue = blue
