@@ -4,10 +4,10 @@ class ViewBuffer:
         self.buffer_length = buffer_length
         self.source = None
 
-    def buffer(self):
+    def buffer(self, source):
         self.buffer_counter += 1
         if self.source is None or self.should_refresh():
-            self.source = self._get_source()
+            self.source = source
             self.buffer_counter = 0
         return self.source
 
@@ -16,12 +16,3 @@ class ViewBuffer:
 
     def _get_source(self) -> list:
         pass
-
-
-class PositionsSource(ViewBuffer):
-    def __init__(self, buffer_length, detection_thread):
-        super().__init__(buffer_length)
-        self.thread = detection_thread
-
-    def _get_source(self) -> list:
-        return self.thread.get_unfiltered_positions(peak=True, wait=False)

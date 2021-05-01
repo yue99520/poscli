@@ -1,15 +1,11 @@
-import abc
 import time
 
-from queue import LifoQueue, Empty
 from copy import deepcopy
-from random import randint
 from threading import Lock
-from typing import List, Tuple
+from typing import List
 
 from apps.base import DetectedObject
 from apps.base.config import Configuration
-from apps.base.thread import ApplicationThread
 from apps.camera import Camera
 from apps.context import SystemContext, DetectThreadInterface
 from apps.detect.coordinate import CoordinateClassifier
@@ -31,37 +27,11 @@ class DetectThread(DetectThreadInterface):
         self._positions_queue = list()
         self._last_positions = None
 
-    def get_unfiltered_positions(self, peak=False, wait=True) -> List[DetectedObject]:
-        if peak:
-            while True:
-                if len(self._positions_queue) > 0:
-                    return deepcopy(self._positions_queue[0])
-                elif not wait:
-                    return list()
-        else:
-            while True:
-                if len(self._positions_queue) > 0:
-                    positions = self._positions_queue[0]
-                    self._positions_queue.remove(positions)
-                    return positions
-                elif not wait:
-                    return list()
-
-        # if wait:
-        #     return self._positions_queue.get()
-        # else:
-        #     try:
-        #         return self._positions_queue.get_nowait()
-        #     except Empty:
-        #         return list()
+    def get_unfiltered_positions(self) -> List[DetectedObject]:
+        return deepcopy(self._unfiltered_positions)
 
     def set_unfiltered_positions(self, unfiltered_positions: List[DetectedObject]):
-        self._positions_queue.append(unfiltered_positions)
-        self._unfiltered_positions_id = randint(0, 1000)
-
-        # self._unfiltered_positions_lock.acquire()
-        # self._unfiltered_positions = unfiltered_positions
-        # self._unfiltered_positions_lock.release()
+        self._unfiltered_positions = unfiltered_positions
 
     def get_detector(self) -> Detector:
         raise NotImplementedError()
@@ -77,7 +47,7 @@ class DetectThread(DetectThreadInterface):
         self.set_unfiltered_positions(positions)
 
     def _log_detected_object(self, detected_object: DetectedObject):
-        if detected_object is not None:
+        if detected_object is not None and self.configuration.system.show_detections_log:
             self.logging.debug(f"DetectThread: name={str(detected_object.name)} x={str(detected_object.x)} y={str(detected_object.y)}")
 
 

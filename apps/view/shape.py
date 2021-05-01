@@ -13,11 +13,13 @@ class Shape:
 
 
 class Rectangle(Shape):
-    def __init__(self, name, point: Point, width: int, height: int):
+    def __init__(self, name, score: float, point: Point, width: int, height: int):
         super().__init__(name)
         self.pt1 = (int(point.x - width / 2), int(point.y - height / 2))
         self.pt2 = (int(point.x + width / 2), int(point.y + height / 2))
+        self.score = score
 
     def draw(self, frame, color):
         cv.rectangle(frame, self.pt1, self.pt2, color)
-        cv.putText(frame, self.name, self.pt2, cv.FONT_HERSHEY_DUPLEX, 1, color=color)
+        txt = f"{self.name} sc: {str(self.score)}"
+        cv.putText(frame, txt, self.pt2, cv.FONT_HERSHEY_DUPLEX, 0.5, color=color)

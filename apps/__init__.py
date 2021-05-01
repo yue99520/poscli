@@ -59,7 +59,7 @@ class Application:
         logging.debug("target thread start")
         self.system_context.target_detect_thread.start()
         logging.debug("process thread start")
-        # self.system_context.process_thread.start()
+        self.system_context.process_thread.start()
         self.system_context.view_thread.run()
 
         # controller = CommandController(self.configuration, self.system_context)

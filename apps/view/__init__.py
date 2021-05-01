@@ -6,7 +6,7 @@ from apps.base import DetectedObject
 from apps.base.config import Configuration
 from apps.camera import Camera
 from apps.context import ViewThreadInterface, SystemContext
-from apps.view.buffer import PositionsSource
+from apps.view.buffer import ViewBuffer
 from apps.view.shape import Rectangle, Point
 
 
@@ -21,21 +21,17 @@ class ViewThread(ViewThreadInterface):
         self.targets = list()
         self.coordinates = list()
 
-        # detection buffer
-        buffer_len = self.configuration.view.buffer_length
-        self.target_positions_source = PositionsSource(buffer_length=buffer_len, detection_thread=self.context.target_detect_thread)
-        self.coordinates_positions_source = PositionsSource(buffer_length=buffer_len, detection_thread=self.context.coordinate_detect_thread)
-
     def run_loop(self) -> None:
         frame = self._camera.get_frame()
 
-        targets: List[DetectedObject] = self.target_positions_source.buffer()
+        targets: List[DetectedObject] = self.context.process_thread.get_targets()
         for target in targets:
             self._attempt_draw_detected_object(frame, target)
 
-        detections: List[DetectedObject] = self.coordinates_positions_source.buffer()
-        for detection in detections:
-            self._attempt_draw_detected_object(frame, detection)
+        origin, red, blue = self.context.process_thread.get_coordinates()
+        self._attempt_draw_detected_object(frame, origin)
+        self._attempt_draw_detected_object(frame, red)
+        self._attempt_draw_detected_object(frame, blue)
 
         cv.imshow(self._window_name, frame)
         cv.waitKey(1)
@@ -48,6 +44,7 @@ class ViewThread(ViewThreadInterface):
     def _detected_object_to_rectangle(self, detected_object: DetectedObject) -> Rectangle:
         return Rectangle(
             name=detected_object.name,
+            score=detected_object.confidence,
             point=Point(detected_object.x, detected_object.y),
             width=detected_object.width,
             height=detected_object.height,

@@ -1,106 +1,82 @@
 import abc
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Optional
 
 from apps.base import DetectedObject
 from apps.base.config import Configuration
 
 
-class RawPositionsFilterer(abc.ABC):
+class DetectionCleaner:
     def __init__(self, config: Configuration):
-        self.config = config
+        self.origin_name: str = config.coordinate.origin_name
+        self.red_name: str = config.coordinate.red_name
+        self.blue_name: str = config.coordinate.blue_name
 
-    def filter(self, raw_positions_stack: List[List[DetectedObject]]) -> Tuple[DetectedObject, DetectedObject, DetectedObject, DetectedObject]:
-        raise NotImplementedError()
+    def de_dup(self, targets, coordinates) -> List[DetectedObject]:
+        grouped_target_list = self._group_by_name(targets)
+        grouped_coordinate_list = self._group_by_name(coordinates)
 
+        best = list()
+        best += self._find_best_detections(grouped_target_list)
+        best += self._find_best_detections(grouped_coordinate_list)
 
-class PositionsFilter(RawPositionsFilterer):
-    def __init__(self, config: Configuration, origin_name, red_name, blue_name):
-        super().__init__(config)
-        self.origin_name = origin_name
-        self.red_name = red_name
-        self.blue_name = blue_name
+        return best
 
-    def filter(self, raw_positions_stack: List[List[DetectedObject]]) -> Tuple[DetectedObject, DetectedObject, DetectedObject, DetectedObject]:
-        for raw_positions in raw_positions_stack:
-            if len(raw_positions) == 0:
-                return None, None, None, None
+    def reg_detections(self, detections: List[DetectedObject]) -> Tuple[Optional[DetectedObject], Optional[DetectedObject], Optional[DetectedObject], List[DetectedObject]]:
+        origin = None
+        red = None
+        blue = None
+        targets = list()
+        for detection in detections:
+            if detection.name == self.origin_name:
+                origin = detection
+            elif detection.name == self.red_name:
+                red = detection
+            elif detection.name == self.blue_name:
+                blue = detection
+            else:
+                targets.append(detection)
+        return origin, red, blue, targets
 
-            best_origin = None
-            best_red = None
-            best_blue = None
-            best_target = None
-            for position in raw_positions_stack:
-                assert isinstance(position, DetectedObject)
-                if position.name == self.origin_name:
-                    pass
-                elif position.name == self.red_name:
-                    pass
-                elif position.name == self.blue_name:
-                    pass
-                else:
-                    if position.width >= best_target.width and position.height >= best_target.height:
-                        if best_target.x >= 10 and best_target.y >= 10:
-                            best_target = position
-            return None, None, None, best_target
+    def _group_by_name(self, detections: List[DetectedObject]):
+        results: List[List[DetectedObject]] = list()
+        for detection in detections:
+            is_exist = False
+            for dup_detections in results:
+                if dup_detections[0].name == detection.name:
+                    dup_detections.append(detection)
+                    is_exist = True
+            if not is_exist:
+                dup_detections = list()
+                dup_detections.append(detection)
+                results.append(dup_detections)
+        return results
 
-            # if len(raw_positions) == 0:
-            #     return raw_positions_stack, None
-            #
-            # best = None
-            # for position in raw_positions_stack:
-            #     if position.name != self._name:
-            #         continue
-            #     if best is None or position.confidence >= best.confidence:
-            #         best = position
-            # return raw_positions_stack, best
+    def _find_best_detections(self, detections_list: List[List[DetectedObject]]) -> List[DetectedObject]:
+        best_detections = list()
+        for detections in detections_list:
+            best = self._find_best_detection(detections)
+            if best is not None:
+                best_detections.append(best)
+        return best_detections
 
-
-
-class CoordinateFilter(RawPositionsFilterer):
-    def __init__(self, config: Configuration, coord_name):
-        super().__init__(config)
-        self._name = coord_name
-
-    def filter(self, raw_positions_stack: List[List[DetectedObject]]) -> Union[DetectedObject, None]:
-
-        if len(raw_positions_stack) == 0:
-            return raw_positions_stack, None
-
+    def _find_best_detection(self, detections: List[DetectedObject]) -> Optional[DetectedObject]:
         best = None
-        for position in raw_positions_stack:
-            if position.name != self._name:
+        for detection in detections:
+            if detection.x <= 10 or detection.y <= 10:
                 continue
-            if best is None or position.confidence >= best.confidence:
-                best = position
-        return raw_positions_stack, best
+
+            if best is None or detection.confidence >= best.confidence:
+                best = detection
+                continue
+        return best
 
 
-class RedCoordinateFilter(CoordinateFilter):
-    def __init__(self, config: Configuration):
-        super().__init__(config, config.coordinate.red_name)
-
-
-class BlueCoordinateFilter(CoordinateFilter):
-    def __init__(self, config: Configuration):
-        super().__init__(config, config.coordinate.blue_name)
-
-
-class OriginCoordinateFilter(CoordinateFilter):
-    def __init__(self, config: Configuration):
-        super().__init__(config, config.coordinate.origin_name)
-
-
-class TargetFilter(RawPositionsFilterer):
-    def filter(self, raw_positions_stack: List[List[DetectedObject]]) -> Union[DetectedObject, None]:
-        if len(raw_positions_stack) == 0:
-            return raw_positions_stack, None
-
-        best = raw_positions_stack[0]
-        for position in raw_positions_stack:
-            if position.width >= best.width and position.height >= best.height:
-                best = position
-
-        if best.x <= 10 or best.y <= 10:
-            # by case 處理辨識模型瑕疵
-            best = None
-        return raw_positions_stack, best
+# class DetectionScorer:
+#     def __init__(self, max_iterations):
+#         self._max_iterations = max_iterations
+#
+#     def add(self, detections: list):
+#         pass
+#
+#     def is_reach(self):
+#         pass

@@ -13,6 +13,8 @@ class Configuration:
     class System:
         def __init__(self, section: SectionProxy):
             self.log_level = section['LogLevel']
+            self.show_detections_log = section['ShowDetectionsLog'] == "True"
+            self.show_processed_log = section['ShowProcessedLog'] == "True"
 
     class Camera:
         def __init__(self, section: SectionProxy):

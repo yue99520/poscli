@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from apps.base import DetectedObject, ProcessedObject, FilteredPositions
 from apps.base.thread import ApplicationThread
@@ -8,15 +8,16 @@ class DetectThreadInterface(ApplicationThread):
     def __init__(self, name: str, context, config):
         super().__init__(name, context, config)
 
-    def get_unfiltered_positions(self, peak=False, wait=True) -> Tuple[List[DetectedObject], int]: ...
+    def get_unfiltered_positions(self) -> Tuple[List[DetectedObject], int]: ...
 
 
 class ProcessThreadInterface(ApplicationThread):
     def __init__(self, name: str, context, config):
         super().__init__(name, context, config)
 
-    def get_processed_target(self) -> Tuple[ProcessedObject, int]: ...
-    def get_filtered_positions(self) -> Tuple[FilteredPositions, int]: ...
+    def get_processed_targets(self) -> Tuple[ProcessedObject, int]: ...
+    def get_coordinates(self) -> Tuple[Optional[DetectedObject], Optional[DetectedObject], Optional[DetectedObject]]: ...
+    def get_targets(self) -> List[DetectedObject]: ...
 
 
 class ArmThreadInterface(ApplicationThread):
