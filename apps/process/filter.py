@@ -1,5 +1,4 @@
-import abc
-from typing import List, Tuple, Union, Optional
+from typing import List, Tuple, Optional
 
 from apps.base import DetectedObject
 from apps.base.config import Configuration
@@ -69,14 +68,3 @@ class DetectionCleaner:
                 best = detection
                 continue
         return best
-
-
-# class DetectionScorer:
-#     def __init__(self, max_iterations):
-#         self._max_iterations = max_iterations
-#
-#     def add(self, detections: list):
-#         pass
-#
-#     def is_reach(self):
-#         pass
