@@ -54,8 +54,8 @@ class Configuration:
             self.destination_y = int(section['DestinationY'])
             self.destination_z = int(section['DestinationZ'])
 
-            self.vertical_off_set = int(section['VerticalOffSet'])
-            self.horizontal_off_set = int(section['HorizontalOffSet'])
+            self.red_base = int(section['RedBase'])
+            self.blue_base = int(section['BlueBase'])
 
             self.reset = section['Reset'] == "True"
 
