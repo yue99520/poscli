@@ -1,3 +1,4 @@
+import time
 from typing import List, Tuple, Dict
 
 from apps.base.config import Configuration
@@ -11,6 +12,7 @@ class ArmThread(ArmThreadInterface):
         super().__init__(name, context, config)
         self.arm = Arm(self.configuration, reset=config.arm.reset)
         self.logging = context.logging
+        self.accumulation_goal = config.arm.accumulation_goal
         self.processed_objects_accumulation: Dict[ProcessedObject, int] = dict()
 
     def run_loop(self) -> None:
@@ -28,7 +30,6 @@ class ArmThread(ArmThreadInterface):
         return processed_object.blue * 10, processed_object.red * 10
 
     def _add_processed_objects(self, processed_objects: List[ProcessedObject]):
-        some_number = 20
         for processed_object in processed_objects:
             is_exist = False
             for po, count in self.processed_objects_accumulation.items():
@@ -36,7 +37,7 @@ class ArmThread(ArmThreadInterface):
                     is_exist = True
                     if int(processed_object.red) == int(po.red) and int(processed_object.blue) == int(po.blue):
                         self.processed_objects_accumulation[po] += 1
-                        if self.processed_objects_accumulation[po] > some_number:
+                        if self.processed_objects_accumulation[po] > self.accumulation_goal:
                             self.processed_objects_accumulation.clear()
                             return po
             if not is_exist:

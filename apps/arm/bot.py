@@ -22,7 +22,7 @@ class Arm:
     def move_object(self, red, blue, wait=True):
         self.bot.move_to(red + self._red_axis_base, blue + self._blue_axis_base, 20)
         self.bot.suck(True)
-        self.bot.move_to(red + self._red_axis_base, blue + self._blue_axis_base, -50)
+        self.bot.move_to(red + self._red_axis_base, blue + self._blue_axis_base, -46)
         self.bot.move_to(red + self._red_axis_base, blue + self._blue_axis_base, 20)
         self.bot.move_to(self._destination_x, self._destination_y, self._destination_z + 70)
         self.bot.move_to(self._destination_x, self._destination_y, self._destination_z)

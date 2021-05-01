@@ -57,6 +57,8 @@ class Configuration:
             self.red_base = int(section['RedBase'])
             self.blue_base = int(section['BlueBase'])
 
+            self.accumulation_goal = int(section['AccumulationGoal'])
+
             self.reset = section['Reset'] == "True"
 
     class View:
