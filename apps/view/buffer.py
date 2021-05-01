@@ -24,4 +24,4 @@ class PositionsSource(ViewBuffer):
         self.thread = detection_thread
 
     def _get_source(self) -> list:
-        return self.thread.get_unfiltered_positions(peak=True)
+        return self.thread.get_unfiltered_positions(peak=True, wait=False)

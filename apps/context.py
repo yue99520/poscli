@@ -8,7 +8,7 @@ class DetectThreadInterface(ApplicationThread):
     def __init__(self, name: str, context, config):
         super().__init__(name, context, config)
 
-    def get_unfiltered_positions(self, peak=False) -> Tuple[List[DetectedObject], int]: ...
+    def get_unfiltered_positions(self, peak=False, wait=True) -> Tuple[List[DetectedObject], int]: ...
 
 
 class ProcessThreadInterface(ApplicationThread):

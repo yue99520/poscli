@@ -34,7 +34,7 @@ class AbstractProcessThread(ProcessThreadInterface):
         self._origin_filter = self.get_origin_filter()
         self._red_filter = self.get_red_filter()
         self._blue_filter = self.get_blue_filter()
-        self._target_filter = self.get_blue_filter()
+        self._position_filter = self.get_blue_filter()
 
         self._processor = self.get_processor()
 
@@ -42,10 +42,9 @@ class AbstractProcessThread(ProcessThreadInterface):
         self._current_target_data_id = -1
 
     def run_loop(self) -> None:
-        raw_targets_stack = self._get_and_merge_target_positions()
-        raw_coordinates_stack = self._get_and_merge_coordinate_positions()
+        raw_positions_stack = self._get_and_merge_positions()
 
-        filtered_positions = self._filter_positions(raw_targets_stack, raw_coordinates_stack)
+        filtered_positions = self._filter_positions(raw_positions_stack)
         self.set_filtered_positions(filtered_positions)
 
         processed_target = self._process_target(
@@ -56,29 +55,23 @@ class AbstractProcessThread(ProcessThreadInterface):
         )
         self.set_processed_target(processed_target)
 
-    def _get_and_merge_coordinate_positions(self) -> List[DetectedObject]:
-        positions = list()
+    def _get_and_merge_positions(self) -> List[List[DetectedObject]]:
+        positions_stack = list()
         for i in range(self.get_merge_depth()):
-            positions.append(self.context.coordinate_detect_thread.get_unfiltered_positions())
-        return positions
-
-    def _get_and_merge_target_positions(self) -> List[DetectedObject]:
-        positions = list()
-        for i in range(self.get_merge_depth()):
-            positions.append(self.context.target_detect_thread.get_unfiltered_positions())
-        return positions
+            positions = list()
+            positions.append(self.context.coordinate_detect_thread.get_unfiltered_positions(peak=False, wait=True))
+            positions.append(self.context.target_detect_thread.get_unfiltered_positions(peak=False, wait=True))
+            positions_stack.append(positions)
+        return positions_stack
     
-    def _filter_positions(self, raw_targets_stack: List[List[DetectedObject]], raw_coordinates_stack: List[List[DetectedObject]]) -> FilteredPositions:
-        filtered_raw_origin = self._origin_filter.filter(raw_coordinates_stack)
-        filtered_raw_red = self._red_filter.filter(raw_coordinates_stack)
-        filtered_raw_blue = self._blue_filter.filter(raw_coordinates_stack)
-        filtered_raw_target = self._target_filter.filter(raw_targets_stack)
+    def _filter_positions(self, raw_positions_stack: List[List[DetectedObject]]) -> FilteredPositions:
+        origin, red, blue, target = self._position_filter.filter(raw_positions_stack)
         
         return FilteredPositions(
-            origin=filtered_raw_origin,
-            red=filtered_raw_red,
-            blue=filtered_raw_blue,
-            target=filtered_raw_target,
+            origin=origin,
+            red=red,
+            blue=blue,
+            target=target,
         )
 
     def _process_target(self, raw_origin, raw_red, raw_blue, raw_target) -> ProcessedObject:

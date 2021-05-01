@@ -28,17 +28,35 @@ class DetectThread(DetectThreadInterface):
         self._unfiltered_positions = list()
         self._unfiltered_positions_id = 0
 
-        self._positions_queue = LifoQueue()
+        self._positions_queue = list()
         self._last_positions = None
 
-    def get_unfiltered_positions(self, peak=False) -> List[DetectedObject]:
-        try:
-            return self._positions_queue.get_nowait()
-        except Empty:
-            return list()
+    def get_unfiltered_positions(self, peak=False, wait=True) -> List[DetectedObject]:
+        if peak:
+            while True:
+                if len(self._positions_queue) > 0:
+                    return deepcopy(self._positions_queue[0])
+                elif not wait:
+                    return list()
+        else:
+            while True:
+                if len(self._positions_queue) > 0:
+                    positions = self._positions_queue[0]
+                    self._positions_queue.remove(positions)
+                    return positions
+                elif not wait:
+                    return list()
+
+        # if wait:
+        #     return self._positions_queue.get()
+        # else:
+        #     try:
+        #         return self._positions_queue.get_nowait()
+        #     except Empty:
+        #         return list()
 
     def set_unfiltered_positions(self, unfiltered_positions: List[DetectedObject]):
-        self._positions_queue.put(item=unfiltered_positions)
+        self._positions_queue.append(unfiltered_positions)
         self._unfiltered_positions_id = randint(0, 1000)
 
         # self._unfiltered_positions_lock.acquire()
