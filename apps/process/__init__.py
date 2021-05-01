@@ -58,7 +58,7 @@ class ProcessThread(ProcessThreadInterface):
             self.logging.debug(f"ProcessThread: name={str(processed_target.name)} red={str(processed_target.red)} blue={str(processed_target.blue)}")
 
     def get_processed_targets(self) -> List[ProcessedObject]:
-        return self._processed_targets
+        return deepcopy(self._processed_targets)
 
     def get_coordinates(self) -> Tuple[Optional[DetectedObject], Optional[DetectedObject], Optional[DetectedObject]]:
         return deepcopy(self._origin), deepcopy(self._red), deepcopy(self._blue)

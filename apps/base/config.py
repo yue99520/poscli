@@ -57,6 +57,8 @@ class Configuration:
             self.vertical_off_set = int(section['VerticalOffSet'])
             self.horizontal_off_set = int(section['HorizontalOffSet'])
 
+            self.reset = section['Reset'] == "True"
+
     class View:
         def __init__(self, section: SectionProxy):
             self.buffer_length = int(section['BufferLength'])
