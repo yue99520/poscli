@@ -22,12 +22,12 @@ class ArmThread(ArmThreadInterface):
 
         optional_processed_object = self._add_processed_objects(processed_objects)
         if optional_processed_object is not None:
-            x, y = self.get_arm_xy(optional_processed_object)
+            name, x, y = self.get_arm_xy(optional_processed_object)
             self._log_arm_position(x, y)
-            self.arm.move_object(x, y, wait=True)
+            self.arm.move_object(name, x, y, wait=True)
 
-    def get_arm_xy(self, processed_object: ProcessedObject) -> Tuple[int, int]:
-        return processed_object.blue * 10, processed_object.red * 10
+    def get_arm_xy(self, processed_object: ProcessedObject) -> Tuple[str, int, int]:
+        return processed_object.name, processed_object.blue * 10, processed_object.red * 10
 
     def _add_processed_objects(self, processed_objects: List[ProcessedObject]):
         for processed_object in processed_objects:
