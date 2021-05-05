@@ -1,4 +1,6 @@
 # pydobot version 1.1.0
+import time
+
 from pydobot.dobot import Dobot
 from serial.tools import list_ports
 
@@ -15,7 +17,7 @@ class Arm:
         },
         "RedBox": {
             "red": -140,
-            "blue": 200,
+            "blue": 270,
             "height": 20,
             "current_height_base": -67,
         },
@@ -26,7 +28,7 @@ class Arm:
             "current_height_base": -67,
         },
         "HerbalCandyBox": {
-            "red": -140,
+            "red": 0,
             "blue": 270,
             "height": 25,
             "current_height_base": -67,
