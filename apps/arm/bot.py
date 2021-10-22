@@ -69,7 +69,7 @@ class Arm:
         self.bot.move_to(d_blue, d_red, d_height + 70)
         self.bot.move_to(d_blue, d_red, d_height)
         self.bot.suck(False)
-        self.bot.move_to(d_blue, d_red, d_height + 70)
-        cmd_id = self.bot.move_to(120, 0, 0)
+        cmd_id = self.bot.move_to(d_blue, d_red, d_height + 70)
+        # cmd_id = self.bot.move_to(120, 0, 0)
         if wait:
             self.bot.wait_for_cmd(cmd_id)
